@@ -6,8 +6,8 @@
     "en": "Linux machines via node_exporter: CPU, memory, disks, temperatures, drive health, updates, alerts.",
     "fr": "Machines Linux via node_exporter : CPU, mémoire, disques, températures, santé disques, alertes."
   },
-  "version": "0.1.0",
-  "docker_image": "ghcr.io/plsoftware/gladys-homelab-monitor:0.1.0",
+  "version": "0.1.1",
+  "docker_image": "ghcr.io/plsoftware/gladys-homelab-monitor:0.1.1",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/plsoftware/gladys-homelab-monitor/main/cover.png",
   "categories": [
