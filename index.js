@@ -21,7 +21,7 @@ import { hostWidget, overviewWidget, formatUptime } from './src/widgets.js';
 
 const gladys = new GladysIntegration();
 
-let config = { hosts: [], poll_frequency: 30, thresholds: DEFAULT_THRESHOLDS };
+let config = { hosts: [], invalid: [], poll_frequency: 30, thresholds: DEFAULT_THRESHOLDS };
 let pollTimer = null;
 let polling = false;
 // device external_id -> { name, address, port, ids, snapshot, online, since, alertState, signature }
@@ -117,6 +117,11 @@ async function pollAll() {
     const up = results.filter(Boolean).length;
     if (up === 0 && hosts.size > 0) {
       await gladys.setConnectionStatus(false, { en: 'No host answered: is node_exporter running and reachable?' });
+    } else if (config.invalid.length) {
+      await gladys.setConnectionStatus(false, {
+        en: `Not a valid host, check the Hosts field: ${config.invalid.join(', ')}`,
+        fr: `Machine invalide, vérifiez le champ Machines : ${config.invalid.join(', ')}`,
+      });
     } else {
       await gladys.setConnectionStatus(true);
     }
@@ -148,6 +153,9 @@ async function start() {
     });
   }
 
+  if (config.invalid.length) {
+    logger.warn(`Ignored invalid host entries: ${config.invalid.join(', ')}`);
+  }
   if (hosts.size === 0) {
     await gladys.setConnectionStatus(false, {
       en: 'Add your hosts in the Configuration tab, e.g. server1=192.168.1.10',

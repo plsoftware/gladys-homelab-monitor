@@ -113,7 +113,7 @@ test('alerts: unreachable needs two missed scrapes; other alerts freeze meanwhil
   r = evaluate(r.state, null, DEFAULT_THRESHOLDS);
   assert.deepEqual(r.transitions.map((x) => [x.alert, x.status]), [['unreachable', 'raised']]);
   r = evaluate(r.state, s, DEFAULT_THRESHOLDS);
-  assert.deepEqual(r.transitions.map((x) => [x.alert, x.status]), [['unreachable', 'cleared']]);
+  assert.deepEqual(r.transitions.map((x) => [x.alert, x.status, x.detail]), [['unreachable', 'cleared', 'back online']]);
 });
 
 test('alerts: a failing drive and failed services', () => {
@@ -132,11 +132,17 @@ test('alerts: a failing drive and failed services', () => {
 });
 
 test('config: hosts, ports, thresholds', () => {
-  assert.deepEqual(parseHosts('net05=192.0.2.5, nas = 192.0.2.6:9101\n192.0.2.7'), [
+  assert.deepEqual(normalizeConfig({ hosts: 'net05=192.0.2.5, nas = 192.0.2.6:9101\n192.0.2.7, pi=raspberrypi.local' }).hosts, [
     { name: 'net05', address: '192.0.2.5', port: 9100 },
     { name: 'nas', address: '192.0.2.6', port: 9101 },
     { name: '192.0.2.7', address: '192.0.2.7', port: 9100 },
+    { name: 'pi', address: 'raspberrypi.local', port: 9100 },
   ]);
+  // Typos are rejected, not polled as unreachable hosts.
+  const typo = normalizeConfig({ hosts: 'net03=192.168.20/100, 192.168.20.1000, ok=192.0.2.9, bad=192.0.2.9:99999' });
+  assert.deepEqual(typo.hosts.map((h) => h.name), ['ok']);
+  assert.deepEqual(typo.invalid, ['net03=192.168.20/100', '192.168.20.1000', 'bad=192.0.2.9:99999']);
+  assert.equal(parseHosts('a=192.0.2.1')[0].address, '192.0.2.1');
   const c = normalizeConfig({ hosts: 'a=192.0.2.1', poll_frequency: 3, disk_threshold: 80 });
   assert.equal(c.poll_frequency, 10);
   assert.equal(c.thresholds.disk, 80);

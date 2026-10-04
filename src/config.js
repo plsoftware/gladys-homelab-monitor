@@ -20,9 +20,18 @@ export function parseHosts(raw) {
       const name = eq === -1 ? null : entry.slice(0, eq).trim();
       const target = eq === -1 ? entry : entry.slice(eq + 1).trim();
       const [address, port] = target.split(':');
-      return { name: name || address, address, port: Number(port) || DEFAULT_PORT };
+      return { name: name || address, address, port: Number(port) || DEFAULT_PORT, entry };
     })
     .filter((h) => h.address);
+}
+
+// An IPv4 address or a host name: "192.168.20/100" or "net 01" is a typo, not a host.
+const IPV4 = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/;
+const HOSTNAME = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i;
+
+export function isValidAddress(address) {
+  if (/^\d+(\.\d+)*$/.test(address)) return IPV4.test(address);
+  return HOSTNAME.test(address);
 }
 
 export function normalizeConfig(raw = {}) {
@@ -30,8 +39,11 @@ export function normalizeConfig(raw = {}) {
     const v = Number(raw[`${key}_threshold`]);
     return Number.isFinite(v) && v > 0 ? v : DEFAULT_THRESHOLDS[key];
   };
+  const parsed = parseHosts(raw.hosts);
+  const valid = (h) => isValidAddress(h.address) && h.port > 0 && h.port < 65536;
   return {
-    hosts: parseHosts(raw.hosts),
+    hosts: parsed.filter(valid).map(({ entry, ...h }) => h),
+    invalid: parsed.filter((h) => !valid(h)).map((h) => h.entry),
     poll_frequency: Math.max(10, Number(raw.poll_frequency ?? 30) || 30),
     thresholds: {
       cpu: threshold('cpu'),

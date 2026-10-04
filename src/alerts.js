@@ -42,7 +42,7 @@ function readings(s, thresholds, active) {
   const badDrives = s.drives.filter((d) => d.healthy === false);
 
   return {
-    unreachable: { over: false, value: null, detail: '' },
+    unreachable: { over: false, value: null, detail: 'back online' },
     cpu: numeric('cpu', s.cpu.percent, `${s.cpu.percent} %`),
     memory: numeric('memory', s.memory.percent, `${s.memory.percent} %`),
     disk: numeric('disk', worstDisk?.percent ?? null, worstDisk ? `${worstDisk.mount} ${worstDisk.percent} %` : ''),
@@ -50,15 +50,17 @@ function readings(s, thresholds, active) {
     drive: {
       over: s.drives.length ? badDrives.length > 0 : null,
       value: badDrives.length,
-      detail: badDrives.map((d) => `${d.key}${d.model ? ` (${d.model})` : ''}`).join(', '),
+      detail: badDrives.length
+        ? badDrives.map((d) => `${d.key}${d.model ? ` (${d.model})` : ''}`).join(', ')
+        : 'all drives healthy',
     },
     services: {
       over: s.failedServices == null ? null : s.failedServices > 0,
       value: s.failedServices,
-      detail: s.failedServices ? `${s.failedServices} failed` : '',
+      detail: s.failedServices ? `${s.failedServices} failed` : 'all running',
     },
-    reboot: { over: s.rebootRequired, value: null, detail: '' },
-    raid: { over: s.raidDegraded, value: null, detail: '' },
+    reboot: { over: s.rebootRequired, value: null, detail: s.rebootRequired ? 'pending kernel or library update' : 'rebooted' },
+    raid: { over: s.raidDegraded, value: null, detail: s.raidDegraded ? 'array degraded' : 'array OK' },
   };
 }
 
