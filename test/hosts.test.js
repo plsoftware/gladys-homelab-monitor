@@ -149,7 +149,11 @@ test('widgets render exactly as sent (SDK validator)', () => {
   const content = hostWidget(host, DEFAULT_THRESHOLDS);
   assert.deepEqual(validateWidgetContent(content), []);
   assert.equal(content.components.filter((c) => c.type === 'gauge').length, 6);
-  const cards = content.components.find((c) => c.type === 'card-list');
+  assert.ok(content.components.some((c) => c.type === 'status'), 'rows by default');
+
+  const cardLayout = hostWidget(host, DEFAULT_THRESHOLDS, 'cards');
+  assert.deepEqual(validateWidgetContent(cardLayout), []);
+  const cards = cardLayout.components.find((c) => c.type === 'card-list');
   assert.equal(cards.display, 'grid');
   assert.deepEqual(cards.items.find((i) => i.title === 'Updates'), {
     title: 'Updates',
@@ -158,9 +162,6 @@ test('widgets render exactly as sent (SDK validator)', () => {
   });
   assert.equal(cards.items.find((i) => i.title === 'Uptime').badge, undefined, 'no badge when nothing needs attention');
 
-  const rowLayout = hostWidget(host, DEFAULT_THRESHOLDS, 'rows');
-  assert.deepEqual(validateWidgetContent(rowLayout), []);
-  assert.ok(rowLayout.components.some((c) => c.type === 'status'));
 
   const down = { name: 'net01', online: false, since: '04/10/26 5:00 pm', snapshot: s, alerts: ['unreachable'] };
   assert.deepEqual(validateWidgetContent(hostWidget(down, DEFAULT_THRESHOLDS)), []);

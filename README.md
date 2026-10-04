@@ -45,7 +45,10 @@ left out rather than shown as zero.
 
 - **Linux host** — one machine: CPU, memory, disk, CPU temperature, swap and load
   gauges coloured against the alert thresholds, plus uptime, memory, network,
-  updates, reboot, services and every drive.
+  updates, reboot, services and every drive. *Details layout*: **Rows** (default —
+  best in a narrow dashboard column, where label and value sit close) or **Cards**
+  (a compact grid; Gladys sizes its cells for posters, so text is cut short in a
+  wide widget).
 - **Linux hosts** — every machine on one line, the ones needing attention first.
 
 ## Scenes

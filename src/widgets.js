@@ -60,7 +60,7 @@ const clip = (s, n = 40) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
  * @param {object} thresholds
  * @param {'cards'|'rows'} layout how the details under the gauges are shown
  */
-export function hostWidget(host, thresholds, layout = 'cards') {
+export function hostWidget(host, thresholds, layout = 'rows') {
   const s = host?.snapshot;
   if (!host) {
     return { ttl_seconds: 60, components: [{ type: 'text', variant: 'body', text: 'Choose a host in the widget settings.' }] };
@@ -166,7 +166,7 @@ export function hostWidget(host, thresholds, layout = 'cards') {
     components: [
       ...(caption ? [{ type: 'text', variant: 'caption', text: clip(caption, 80) }] : []),
       ...gauges.slice(0, 6),
-      layout === 'rows' ? { type: 'status', items: items.slice(0, 10) } : detailCards(items),
+      layout === 'cards' ? detailCards(items) : { type: 'status', items: items.slice(0, 10) },
     ],
   };
 }

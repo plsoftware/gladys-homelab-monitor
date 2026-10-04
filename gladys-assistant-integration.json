@@ -143,24 +143,24 @@
           "key": "layout",
           "type": "select",
           "required": false,
-          "default": "cards",
+          "default": "rows",
           "label": {
             "en": "Details layout",
             "fr": "Présentation des détails"
           },
           "options": [
             {
-              "value": "cards",
+              "value": "rows",
               "label": {
-                "en": "Cards (label and value together)",
-                "fr": "Cartes (libellé et valeur ensemble)"
+                "en": "Rows (best in a narrow column)",
+                "fr": "Lignes (idéal dans une colonne étroite)"
               }
             },
             {
-              "value": "rows",
+              "value": "cards",
               "label": {
-                "en": "Rows (full width)",
-                "fr": "Lignes (pleine largeur)"
+                "en": "Cards (compact grid)",
+                "fr": "Cartes (grille compacte)"
               }
             }
           ]
