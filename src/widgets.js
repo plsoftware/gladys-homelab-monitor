@@ -58,8 +58,9 @@ const clip = (s, n = 40) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 /**
  * @param {object} host { name, online, since, snapshot, alerts: string[] }
  * @param {object} thresholds
+ * @param {'cards'|'rows'} layout how the details under the gauges are shown
  */
-export function hostWidget(host, thresholds) {
+export function hostWidget(host, thresholds, layout = 'cards') {
   const s = host?.snapshot;
   if (!host) {
     return { ttl_seconds: 60, components: [{ type: 'text', variant: 'body', text: 'Choose a host in the widget settings.' }] };
@@ -165,8 +166,27 @@ export function hostWidget(host, thresholds) {
     components: [
       ...(caption ? [{ type: 'text', variant: 'caption', text: clip(caption, 80) }] : []),
       ...gauges.slice(0, 6),
-      { type: 'status', items: items.slice(0, 10) },
+      layout === 'rows' ? { type: 'status', items: items.slice(0, 10) } : detailCards(items),
     ],
+  };
+}
+
+const BADGE = { [COLOR.DANGER]: 'Alert', [COLOR.WARNING]: 'Check' };
+
+/**
+ * The details as a grid of small cards (label as the title, value under it)
+ * instead of full-width rows: label and value stay together however wide the
+ * widget is. Colour survives as a badge on the cards that need attention.
+ */
+function detailCards(items) {
+  return {
+    type: 'card-list',
+    display: 'grid',
+    items: items.slice(0, 12).map((i) => ({
+      title: clip(i.label, 60),
+      subtitle: String(i.value),
+      ...(BADGE[i.color] ? { badge: { text: BADGE[i.color], color: i.color } } : {}),
+    })),
   };
 }
 

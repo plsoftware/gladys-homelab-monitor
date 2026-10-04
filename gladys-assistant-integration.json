@@ -138,6 +138,32 @@
             "fr": "Machine"
           },
           "required": true
+        },
+        {
+          "key": "layout",
+          "type": "select",
+          "required": false,
+          "default": "cards",
+          "label": {
+            "en": "Details layout",
+            "fr": "Présentation des détails"
+          },
+          "options": [
+            {
+              "value": "cards",
+              "label": {
+                "en": "Cards (label and value together)",
+                "fr": "Cartes (libellé et valeur ensemble)"
+              }
+            },
+            {
+              "value": "rows",
+              "label": {
+                "en": "Rows (full width)",
+                "fr": "Lignes (pleine largeur)"
+              }
+            }
+          ]
         }
       ]
     },

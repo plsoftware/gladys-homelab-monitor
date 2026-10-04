@@ -190,7 +190,7 @@ const hostView = (h) => ({ ...h, alerts: raisedAlerts(h.alertState) });
 
 gladys.onWidgetGet('host', async ({ settings }) => {
   const host = hosts.get(settings?.host);
-  return hostWidget(host ? hostView(host) : null, config.thresholds);
+  return hostWidget(host ? hostView(host) : null, config.thresholds, settings?.layout === 'rows' ? 'rows' : 'cards');
 });
 
 gladys.onWidgetGet('overview', async () => overviewWidget([...hosts.values()].map(hostView), config.thresholds));
