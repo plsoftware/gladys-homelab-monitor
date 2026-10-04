@@ -14,6 +14,13 @@ sudo apt install prometheus-node-exporter prometheus-node-exporter-collectors
 
 Vérifiez qu'il répond : `http://<machine>:9100/metrics` dans un navigateur.
 
+Les disques montés sous `/mnt` ou `/media` sont masqués par le paquet Debian/Ubuntu. Pour les afficher :
+
+```
+echo 'ARGS="--collector.filesystem.mount-points-exclude=^/(dev|proc|run|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)"' | sudo tee /etc/default/prometheus-node-exporter
+sudo systemctl restart prometheus-node-exporter
+```
+
 ## Configuration
 
 1. **Machines** : `nom=adresse`, séparés par des virgules, ex. `serveur1=192.168.1.10, nas=192.168.1.11`.

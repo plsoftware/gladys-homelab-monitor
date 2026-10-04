@@ -23,6 +23,14 @@ updates, reboot-required, SMART and NVMe readings; without it those features are
 simply absent. Port 9100 should be reachable from the Gladys host only — restrict it
 with your firewall if the LAN is not trusted.
 
+**Disks under `/mnt` or `/media`:** the Debian/Ubuntu package hides them by default
+(upstream node_exporter does not). To see them:
+
+```bash
+echo 'ARGS="--collector.filesystem.mount-points-exclude=^/(dev|proc|run|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)"' | sudo tee /etc/default/prometheus-node-exporter
+sudo systemctl restart prometheus-node-exporter
+```
+
 ## Features (per machine)
 
 | Feature | Type |
