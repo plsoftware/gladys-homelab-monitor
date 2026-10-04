@@ -173,3 +173,22 @@ test('widgets render exactly as sent (SDK validator)', () => {
   assert.equal(rows[0].label, 'net01', 'problems first');
   assert.equal(formatBytes(16108920832), '15.0 GB');
 });
+
+test('Proxmox: nic0 is the physical NIC, /etc/pve is not a disk', () => {
+  const m = parseMetrics(
+    [
+      'node_network_receive_bytes_total{device="nic0"} 100',
+      'node_network_transmit_bytes_total{device="nic0"} 100',
+      'node_network_up{device="nic0"} 1',
+      'node_network_receive_bytes_total{device="vmbr0"} 100',
+      'node_network_receive_bytes_total{device="fwbr102i0"} 100',
+      'node_network_receive_bytes_total{device="tap101i0"} 100',
+      'node_filesystem_size_bytes{device="/dev/fuse",fstype="fuse",mountpoint="/etc/pve"} 1000',
+      'node_filesystem_free_bytes{device="/dev/fuse",fstype="fuse",mountpoint="/etc/pve"} 1000',
+      'node_filesystem_avail_bytes{device="/dev/fuse",fstype="fuse",mountpoint="/etc/pve"} 1000',
+    ].join('\n'),
+  );
+  const p = snapshot(m);
+  assert.deepEqual(p.network.map((n) => n.device), ['nic0']);
+  assert.deepEqual(p.filesystems, []);
+});

@@ -12,12 +12,15 @@ const VIRTUAL_FS = new Set([
   'tmpfs', 'ramfs', 'devtmpfs', 'overlay', 'squashfs', 'nsfs', 'autofs', 'efivarfs', 'proc', 'sysfs',
   'cgroup', 'cgroup2', 'tracefs', 'debugfs', 'securityfs', 'pstore', 'bpf', 'configfs', 'fusectl',
   'mqueue', 'hugetlbfs', 'binfmt_misc', 'rpc_pipefs', 'devpts', 'fuse.lxcfs', 'fuse.snapfuse',
+  // Plain fuse: Proxmox's cluster config (pmxcfs on /etc/pve) and similar services.
+  'fuse', 'fuse.portal', 'fuse.gvfsd-fuse',
 ]);
 // Network filesystems belong to the machine serving them, not to this host.
 const NETWORK_FS = /^(nfs4?|cifs|smb3?|sshfs|fuse\.sshfs|9p|ceph|glusterfs|fuse\.glusterfs)$/;
 const HIDDEN_MOUNTS = /^\/(run|snap|proc|sys|dev|var\/lib\/docker|var\/snap|var\/lib\/kubelet|var\/lib\/containers)(\/|$)/;
 // Physical NICs; bridges, veths and docker interfaces only repeat their traffic.
-const PHYSICAL_NIC = /^(en|eth|wl|ww|bond)/;
+// `nic0`: Proxmox VE 9 pins its physical interfaces under that name.
+const PHYSICAL_NIC = /^(en|eth|wl|ww|bond|nic\d)/;
 
 const all = (m, name) => m.get(name) ?? [];
 const first = (m, name, match = () => true) => all(m, name).find((s) => match(s.labels))?.value ?? null;
